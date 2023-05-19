@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Quick Farm and Recyc Trader
 // @namespace    http://tampermonkey.net/
-// @version      0.5.0
+// @version      0.5.1
 // @description  Adds buttons to SB trade screen to quickly get farm or recyc goods. 0.5.0 adds support for checkboxes to increase flexibility, adds support for 1 "*" buy instruction (to fill all remaining space), and fixes a display bug when only part of the buy order can be fulfilled.
 // @author       Bocaj
 // @match        http*://*.pardus.at/starbase_trade.php*
@@ -130,9 +130,7 @@
 
     // Trade form elements
     const tradeFormBody = document.getElementsByTagName("form")[0].getElementsByTagName("tr")[1];
-    const sellCol = tradeFormBody.children[0].getElementsByTagName("tbody")[0];
     const buttonCol = tradeFormBody.children[1];
-    const buyCol = tradeFormBody.children[2].getElementsByTagName("tbody")[0];
     const tradeButton = buttonCol.getElementsByTagName("input")[0];
 
     // Create logical view of page for easier manipulation
@@ -142,13 +140,15 @@
 
     const viewModel = {}; // commodityName: string?: {amountOnShip: int, sellInputCell: HtmlElement?, amountInStarbase: int, min: int, max: int, buyInputCell: HtmlElement?}
     const freeSpaceShip = parseToInt(sellColArray[sellColArray.length-2].getElementsByTagName("td")[1].innerHTML);
+
+    // Check about how magnetic scoops affect things
+    console.log(freeSpaceShip);
+    console.log(sellColArray[sellColArray.length-2].getElementsByTagName("td")[1].innerHTML);
+
     const freeSpaceStarbase = parseToInt(buyColArray[buyColArray.length-2].getElementsByTagName("td")[1].innerHTML);
 
-    let buyAmberStim = false;
-    let maxOnEnergy = false;
-
     commodityNames.forEach(commodity => {
-        // Closures
+        // Scraping helper
         const getRow = (array) => array.find(row => {
             let tds = row.getElementsByTagName("td");
             if (tds.length > 1) {
@@ -311,8 +311,11 @@
     */
     function addButtons() {
         const newTable = document.createElement("table");
+
+        // Add checkboxes
         newTable.append(getCheckboxDiv());
 
+        // Add button groups to table
         if (instructions[universe].buttonGroups) {
             instructions[universe].buttonGroups.forEach(buttonGroup => {
                 const groupTable = document.createElement("table");
@@ -322,26 +325,33 @@
             });
         }
 
+        // Add individual buttons to table
         if (instructions[universe].buttons) {
             arrangeTableHeaderLabel("Individual Buttons", newTable, 1);
             instructions[universe].buttons.forEach(buttonInfo => arrangeRowOfButtons([buttonInfo], newTable));
         }
 
+        // Attach to page HTML
         buttonCol.append(newTable);
     }
-    function getCheckboxDiv(table) {
+
+    function getCheckboxDiv() {
         const div = document.createElement("div");
         checkBoxInstructions.forEach((element, index) => {
+            // Checkbox
             const checkbox = document.createElement("input");
             checkbox.setAttribute("type", "checkbox");
             checkbox.setAttribute("id", `checkbox${index}`);
             div.append(checkbox);
+
+            // Label
             const label = document.createElement("label");
             label.innerHTML = element.label + "<br/>";
             div.append(label);
         });
         return div;
     }
+
     function arrangeTableHeaderLabel(label, table, colspan) {
         const tr = document.createElement("tr");
         const th = document.createElement("th");
@@ -350,6 +360,7 @@
         tr.append(th);
         table.append(tr);
     }
+
     function arrangeRowOfButtons(buttonInfoArray, table) {
         const tr = document.createElement("tr");
         buttonInfoArray.forEach(buttonInfo => {
@@ -358,6 +369,7 @@
         });
         table.append(tr);
     }
+
     function makeButtonReturnTd(buttonInfo) {
         const button = document.createElement("BUTTON");
         button.innerHTML = buttonInfo.label;
@@ -365,10 +377,7 @@
         const td = document.createElement("td");
         td.append(button);
         return td;
-
-        const tr = document.createElement("tr");
-        tr.append(td);
-        newTable.append(tr);
     }
+
     addButtons();
 })();
