@@ -1,5 +1,5 @@
 // ==UserScript==
-// @name         Quick Farm and Recyc Trader
+// @name         Trade Button Script
 // @namespace    http://tampermonkey.net/
 // @version      0.5.1
 // @description  Adds buttons to SB trade screen to quickly get farm or recyc goods. 0.5.0 adds support for checkboxes to increase flexibility, adds support for 1 "*" buy instruction (to fill all remaining space), and fixes a display bug when only part of the buy order can be fulfilled.
