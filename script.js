@@ -6,6 +6,7 @@
 // @author       Bocaj
 // @match        http*://*.pardus.at/starbase_trade.php*
 // @icon         data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==
+// @license      MIT
 // @grant        none
 // ==/UserScript==
 
